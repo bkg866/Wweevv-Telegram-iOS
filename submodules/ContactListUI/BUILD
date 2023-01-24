@@ -4,7 +4,7 @@ swift_library(
     name = "ContactListUI",
     module_name = "ContactListUI",
     srcs = glob([
-        "Sources/**/*.swift",
+        "Sources/**/*.swift"
     ]),
     copts = [
         "-warnings-as-errors",
@@ -36,6 +36,21 @@ swift_library(
         "//submodules/AnimatedStickerNode:AnimatedStickerNode",
         "//submodules/TelegramAnimatedStickerNode:TelegramAnimatedStickerNode",
         "//submodules/QrCodeUI:QrCodeUI",
+        "//submodules/HandyJSON:HandyJSON",
+        "//third-party/Kingfisher",
+        "//submodules/InstantPageUI:InstantPageUI",
+        "//third-party/Alamofire",
+        "//submodules/RESegmentedControl:RESegmentedControl",
+        "//submodules/GalleryUI:GalleryUI",
+        "//submodules/Postbox:Postbox",
+        "//third-party/Supabase:Supabase",
+        "//third-party/MBProgressHUD:MBProgressHUD",
+        "//third-party/MJRefresh:MJRefresh",
+        "//submodules/LegacyComponents:LegacyComponents",
+        "//submodules/WevModel:WevModel",
+        "//submodules/WevConfig:WevConfig",
+        "//submodules/WevNetworkManager:WevNetworkManager",
+        "//submodules/SnapKit:SnapKit"
     ],
     visibility = [
         "//visibility:public",

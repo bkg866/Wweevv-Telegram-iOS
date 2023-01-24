@@ -210,9 +210,11 @@ public func accountWithId(accountManager: AccountManager<TelegramAccountManagerT
                                 )!, forKey: id as NSNumber)
                             }
                             
-                            let data = NSKeyedArchiver.archivedData(withRootObject: dict)
-                            transaction.setState(backupState)
-                            transaction.setKeychainEntry(data, forKey: "persistent:datacenterAuthInfoById")
+                            if let data = try? NSKeyedArchiver.archivedData(withRootObject: dict, requiringSecureCoding: false) //🔥 false or true?
+                            {
+                                transaction.setState(backupState)
+                                transaction.setKeychainEntry(data, forKey: "persistent:datacenterAuthInfoById")
+                            }
                         }
                         
                         return (state, localizationSettings, proxySettings, transaction.getPreferencesEntry(key: PreferencesKeys.networkSettings)?.get(NetworkSettings.self))
@@ -369,18 +371,13 @@ public func hexString(_ data: Data) -> String {
 
 public func dataWithHexString(_ string: String) -> Data {
     var hex = string
-    if hex.count % 2 != 0 {
-        return Data()
-    }
     var data = Data()
     while hex.count > 0 {
         let subIndex = hex.index(hex.startIndex, offsetBy: 2)
         let c = String(hex[..<subIndex])
         hex = String(hex[subIndex...])
-        var ch: UInt32 = 0
-        if !Scanner(string: c).scanHexInt32(&ch) {
-            return Data()
-        }
+        var ch: UInt64 = 0
+        Scanner(string: c).scanHexInt64(&ch)
         var char = UInt8(ch)
         data.append(&char, count: 1)
     }
@@ -812,7 +809,7 @@ public func accountBackupData(postbox: Postbox) -> Signal<AccountBackupData?, No
         guard let authInfoData = transaction.keychainEntryForKey("persistent:datacenterAuthInfoById") else {
             return nil
         }
-        guard let authInfo = NSKeyedUnarchiver.unarchiveObject(with: authInfoData) as? NSDictionary else {
+        guard let authInfo = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData( authInfoData) as? NSDictionary else {
             return nil
         }
         guard let datacenterAuthInfo = authInfo.object(forKey: state.masterDatacenterId as NSNumber) as? MTDatacenterAuthInfo else {

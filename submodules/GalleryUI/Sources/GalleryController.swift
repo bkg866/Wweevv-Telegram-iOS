@@ -400,7 +400,21 @@ public class GalleryController: ViewController, StandalonePresentableController,
     
     private var initialOrientation: UIInterfaceOrientation?
     
-    public init(context: AccountContext, source: GalleryControllerItemSource, invertItemOrder: Bool = false, streamSingleVideo: Bool = false, fromPlayingVideo: Bool = false, landscape: Bool = false, timecode: Double? = nil, playbackRate: Double? = nil, synchronousLoad: Bool = false, replaceRootController: @escaping (ViewController, Promise<Bool>?) -> Void, baseNavigationController: NavigationController?, actionInteraction: GalleryControllerActionInteraction? = nil) {
+    //wweevv
+    public var onLike: (() -> Void)?
+    public var onDislike: (() -> Void)?
+    public var onSubscribe: (() -> Void)?
+    public var onDesubscribe: (() -> Void)?
+    public var onShare: (() -> Void)?
+
+    private var isShowLikeButton: Bool = false
+    private var isVideoLiked: Bool = false
+    private var isShowSubcribe: Bool = false
+    private var isVideoSubscribed: Bool = false
+    private var isShowShare: Bool = false
+
+    
+    public init(context: AccountContext, source: GalleryControllerItemSource, invertItemOrder: Bool = false, streamSingleVideo: Bool = false, fromPlayingVideo: Bool = false, landscape: Bool = false, timecode: Double? = nil, playbackRate: Double? = nil, synchronousLoad: Bool = false, isShowLike: Bool = false, isVideoLiked: Bool = false, isShowSubcribe: Bool = false, isVideoSubscribed: Bool = false, isShowShare: Bool = false, replaceRootController: @escaping (ViewController, Promise<Bool>?) -> Void, baseNavigationController: NavigationController?, actionInteraction: GalleryControllerActionInteraction? = nil) {
         self.context = context
         self.source = source
         self.invertItemOrder = invertItemOrder

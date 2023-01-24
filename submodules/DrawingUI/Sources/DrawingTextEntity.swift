@@ -1046,7 +1046,7 @@ private class DrawingTextLayoutManager: NSLayoutManager {
             graphicsContext.saveGState()
             graphicsContext.translateBy(x: self.strokeOffset.x, y: self.strokeOffset.y)
             
-            super.showCGGlyphs(glyphs, positions: positions, count: glyphCount, font: font, matrix: textMatrix, attributes: attributes, in: graphicsContext)
+            //super.showCGGlyphs(glyphs, positions: positions, count: glyphCount, font: font, matrix: textMatrix, attributes: attributes, in: graphicsContext)
             
             graphicsContext.restoreGState()
             
@@ -1055,7 +1055,7 @@ private class DrawingTextLayoutManager: NSLayoutManager {
             graphicsContext.setFillColor(textColor.cgColor)
             graphicsContext.setTextDrawingMode(.fill)
         }
-        super.showCGGlyphs(glyphs, positions: positions, count: glyphCount, font: font, matrix: textMatrix, attributes: attributes, in: graphicsContext)
+        //super.showCGGlyphs(glyphs, positions: positions, count: glyphCount, font: font, matrix: textMatrix, attributes: attributes, in: graphicsContext)
     }
     
     override func drawBackground(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
