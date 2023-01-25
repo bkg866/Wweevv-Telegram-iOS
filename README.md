@@ -74,9 +74,7 @@ python3 build-system/Make/Make.py \
     --codesigningInformationPath="$HOME/telegram-configuration-development"
 ```
 
-8. Create Project without extension and 
-
-(probably for simulator) It is possible to generate a project that does not require any codesigning certificates to be installed: add `--disableProvisioningProfiles` flag:
+8. **For simulator** - It is possible to generate a project that does not require any codesigning certificates to be installed: add `--disableProvisioningProfiles` flag:
 ```
 python3 build-system/Make/Make.py \
     --cacheDir="$HOME/telegram-bazel-cache" \
