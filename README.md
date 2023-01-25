@@ -23,12 +23,21 @@ git clone --recursive -j8 https://github.com/TelegramMessenger/Telegram-iOS.git
 3. Adjust configuration parameters
 
 ```
-mkdir -p $HOME/telegram-configuration
+//Production 
+mkdir -p $HOME/telegram-configuration (For Production)
+
+//development
+mkdir -p $HOME/telegram-configuration-development (For development)
+
+//Production Configuration copy
 cp -R build-system/example-configuration/* $HOME/telegram-configuration/
+
+//development Configuration copy
+cp -R build-system/example-configuration-development/* $HOME/telegram-configuration-development/
 ```
 
-- Modify the values in `variables.bzl`
-- Replace the provisioning profiles in `provisioning` with valid files
+- Modify the values in `variables.bzl` (wweevv not required in build system it's already setup for this project)
+- Replace the provisioning profiles in `provisioning` with valid files (wweevv not required in build system it's already added provisioning profile for this project)
 
 4. (Optional) Create a build cache directory to speed up rebuilds
 
@@ -36,28 +45,51 @@ cp -R build-system/example-configuration/* $HOME/telegram-configuration/
 mkdir -p "$HOME/telegram-bazel-cache"
 ```
 
-5. Build the app
+5.  Generate IPA Build of app
 
 ```
 python3 build-system/Make/Make.py \
     --cacheDir="$HOME/telegram-bazel-cache" \
     build \
     --configurationPath="$HOME/telegram-configuration" \
-    --buildNumber=100001 \
+    --buildNumber=8 \
     --configuration=release_universal
 ```
 
-6. (Optional) Generate an Xcode project
+6. Generate an Xcode project for development build
 
 ```
 python3 build-system/Make/Make.py \
     --cacheDir="$HOME/telegram-bazel-cache" \
     generateProject \
-    --configurationPath="$HOME/telegram-configuration" \
+    --configurationPath="$HOME/telegram-configuration-development"
+```
+7. (Optional) Generate an Xcode project for production
+
+```
+python3 build-system/Make/Make.py \
+    --cacheDir="$HOME/telegram-bazel-cache" \
+    generateProject \
+    --configurationPath="$HOME/telegram-configuration"
+```
+8. Clear Cache
+
+```
+python3 build-system/Make/Make.py \
+    --cacheDir="$HOME/telegram-bazel-cache" \
+    clean
+```
+9. Create Project without extension (Must required extesnion of releae build)
+
+```
+python3 build-system/Make/Make.py \
+    --cacheDir="$HOME/telegram-bazel-cache" \
+    generateProject \
+    --configurationPath="$HOME/telegram-configuration-development" \
     --disableExtensions
 ```
-
-It is possible to generate a project that does not require any codesigning certificates to be installed: add `--disableProvisioningProfiles` flag:
+    
+(probably for simulator) It is possible to generate a project that does not require any codesigning certificates to be installed: add `--disableProvisioningProfiles` flag:
 ```
 python3 build-system/Make/Make.py \
     --cacheDir="$HOME/telegram-bazel-cache" \
