@@ -40,6 +40,9 @@ enum SettingsSearchableItemIcon {
     case deleteAccount
     case devices
     case premium
+    case watchLater
+    case shareEarn
+    case applyReferral
 }
 
 public enum SettingsSearchableItemId: Hashable {
@@ -61,6 +64,9 @@ public enum SettingsSearchableItemId: Hashable {
     case deleteAccount(Int32)
     case devices(Int32)
     case premium(Int32)
+    case watchLater(Int32)
+    case shareEarn(Int32)
+    case applyReferral(Int32)
     
     private var namespace: Int32 {
         switch self {
@@ -100,6 +106,12 @@ public enum SettingsSearchableItemId: Hashable {
             return 18
         case .premium:
             return 19
+        case .watchLater:
+            return 20
+        case .shareEarn:
+            return 21
+        case .applyReferral:
+            return 22
         }
     }
     
@@ -122,8 +134,11 @@ public enum SettingsSearchableItemId: Hashable {
                  let .chatFolders(id),
                  let .deleteAccount(id),
                  let .devices(id),
-                 let .premium(id):
-                return id
+                 let .premium(id),
+                 let .watchLater(id),
+                 let .shareEarn(id),
+                 let .applyReferral(id):
+                 return id
         }
     }
     
@@ -171,6 +186,12 @@ public enum SettingsSearchableItemId: Hashable {
             self = .devices(id)
         case 19:
             self = .premium(id)
+        case 20:
+            self = .watchLater(id)
+        case 21:
+            self = .shareEarn(id)
+        case 22:
+            self = .applyReferral(id)
         default:
             return nil
         }

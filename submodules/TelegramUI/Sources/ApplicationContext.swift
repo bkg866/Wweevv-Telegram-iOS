@@ -26,6 +26,7 @@ import AccountUtils
 import ContextUI
 import TelegramCallsUI
 import AuthorizationUI
+import ContactListUI
 
 final class UnauthorizedApplicationContext {
     let sharedContext: SharedAccountContextImpl
@@ -753,10 +754,11 @@ final class AuthorizedApplicationContext {
         }
         self.showCallsTabDisposable = (showCallsTabSignal |> deliverOnMainQueue).start(next: { [weak self] value in
             if let strongSelf = self {
-                if strongSelf.showCallsTab != value {
+                /*if strongSelf.showCallsTab != value {
                     strongSelf.showCallsTab = value
                     strongSelf.rootController.updateRootControllers(showCallsTab: value)
-                }
+                }*/
+                strongSelf.rootController.updateRootControllers(showCallsTab: UserDefaults.standard.bool(forKey: "isShowFeed"))
             }
         })
         
@@ -901,6 +903,13 @@ final class AuthorizedApplicationContext {
             })
         } else {
             self.scheduledOpenExternalUrl = url
+        }
+    }
+    
+    func openVideoPlayer(videoId: String, type: Int) {
+        if let tabbar = self.rootController.rootTabController, let wevDiscover = tabbar.controllers.first as? WEVRootViewController {
+            tabbar.selectedIndex = 0
+            wevDiscover.playUniversalLinkedVideos(videoId: videoId, type: type)
         }
     }
     

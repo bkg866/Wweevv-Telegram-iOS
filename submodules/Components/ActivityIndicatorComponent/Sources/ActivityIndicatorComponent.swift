@@ -20,7 +20,7 @@ public final class ActivityIndicatorComponent: Component {
     
     public final class View: UIActivityIndicatorView {
         public init() {
-            super.init(style: .whiteLarge)
+            super.init(style: .large)
         }
         
         required public init(coder: NSCoder) {

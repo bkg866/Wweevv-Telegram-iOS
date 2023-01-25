@@ -37,6 +37,11 @@ public struct PresentationResourcesSettings {
     public static let language = renderIcon(name: "Settings/Menu/Language")
     
     public static let deleteAccount = renderIcon(name: "Chat/Info/GroupRemovedIcon")
+    //wweevv seeting options
+    public static let watchLater = renderIcon(name: "Settings/Menu/watchLater")
+    public static let shareEarn = renderIcon(name: "Settings/Menu/shareEarn")
+    public static let applyReferral = renderIcon(name: "Settings/Menu/shareEarn")
+    public static let feedTab = renderIcon(name: "Settings/Menu/FeedTab")
     
     public static let premium = generateImage(CGSize(width: 29.0, height: 29.0), contextGenerator: { size, context in
         let bounds = CGRect(origin: CGPoint(), size: size)

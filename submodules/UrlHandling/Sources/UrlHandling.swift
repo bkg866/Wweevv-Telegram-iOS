@@ -838,7 +838,7 @@ public func parseProxyUrl(_ url: String) -> (host: String, port: Int32, username
             }
         }
     }
-    if let parsedUrl = URL(string: url), parsedUrl.scheme == "tg", let host = parsedUrl.host, let query = parsedUrl.query {
+    if let parsedUrl = URL(string: url), parsedUrl.scheme == "wev", let host = parsedUrl.host, let query = parsedUrl.query {
         if let internalUrl = parseInternalUrl(query: host + "?" + query), case let .proxy(host, port, username, password, secret) = internalUrl {
             return (host, port, username, password, secret)
         }
@@ -859,7 +859,7 @@ public func parseStickerPackUrl(_ url: String) -> String? {
             }
         }
     }
-    if let parsedUrl = URL(string: url), parsedUrl.scheme == "tg", let host = parsedUrl.host, let query = parsedUrl.query {
+    if let parsedUrl = URL(string: url), parsedUrl.scheme == "wev", let host = parsedUrl.host, let query = parsedUrl.query {
         if let internalUrl = parseInternalUrl(query: host + "?" + query), case let .stickerPack(name, _) = internalUrl {
             return name
         }
@@ -880,7 +880,7 @@ public func parseWallpaperUrl(_ url: String) -> WallpaperUrlParameter? {
             }
         }
     }
-    if let parsedUrl = URL(string: url), parsedUrl.scheme == "tg", let host = parsedUrl.host, let query = parsedUrl.query {
+    if let parsedUrl = URL(string: url), parsedUrl.scheme == "wev", let host = parsedUrl.host, let query = parsedUrl.query {
         if let internalUrl = parseInternalUrl(query: host + "?" + query), case let .wallpaper(wallpaper) = internalUrl {
             return wallpaper
         }

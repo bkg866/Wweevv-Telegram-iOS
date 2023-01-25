@@ -113,7 +113,7 @@ public func parseConfirmationCodeUrl(_ url: URL) -> Int? {
             return code
         }
     }
-    if url.scheme == "tg" {
+    if url.scheme == "wev" {
         if let host = url.host, let query = url.query, let parsedUrl = parseInternalUrl(query: host + "?" + query) {
             switch parsedUrl {
                 case let .confirmationCode(code):
@@ -244,7 +244,7 @@ func openExternalUrlImpl(context: AccountContext, urlContext: OpenURLContext, ur
             |> deliverOnMainQueue).start(next: handleResolvedUrl)
         }
         
-        if let scheme = parsedUrl.scheme, (scheme == "tg" || scheme == context.sharedContext.applicationBindings.appSpecificScheme) {
+        if let scheme = parsedUrl.scheme, (scheme == "wev" || scheme == context.sharedContext.applicationBindings.appSpecificScheme) {
             var convertedUrl: String?
             if let query = parsedUrl.query {
                 if parsedUrl.host == "localpeer" {

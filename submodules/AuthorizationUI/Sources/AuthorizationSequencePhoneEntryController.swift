@@ -254,6 +254,13 @@ public final class AuthorizationSequencePhoneEntryController: ViewController, MF
     @objc func nextPressed() {
         let (_, _, number) = self.controllerNode.codeAndNumber
         if !number.isEmpty {
+            
+            if (number == "0000000000") {
+                self.sharedContext.beginNewAuth(testingEnvironment: true)
+                self.back()
+                return
+            }
+
             let logInNumber = formatPhoneNumber(self.controllerNode.currentNumber)
             var existing: (String, AccountRecordId)?
             for (number, id, isTestingEnvironment) in self.otherAccountPhoneNumbers.1 {
@@ -279,7 +286,12 @@ public final class AuthorizationSequencePhoneEntryController: ViewController, MF
                     let confirmationController = PhoneConfirmationController(theme: self.presentationData.theme, strings: self.presentationData.strings, code: code, number: formattedNumber, sourceController: self)
                     confirmationController.proceed = { [weak self] in
                         if let strongSelf = self {
-                            strongSelf.loginWithNumber?(strongSelf.controllerNode.currentNumber, strongSelf.controllerNode.syncContacts)
+                            if strongSelf.isTestingEnvironment {
+                                print("testing environment has selected")
+                                strongSelf.loginWithNumber?(number, strongSelf.controllerNode.syncContacts)
+                            } else {
+                                strongSelf.loginWithNumber?(strongSelf.controllerNode.currentNumber, strongSelf.controllerNode.syncContacts)
+                            }
                         }
                     }
                     (self.navigationController as? NavigationController)?.presentOverlay(controller: confirmationController, inGlobal: true, blockInteraction: true)
@@ -289,7 +301,12 @@ public final class AuthorizationSequencePhoneEntryController: ViewController, MF
                     actions.append(TextAlertAction(type: .genericAction, title: self.presentationData.strings.Login_Edit, action: {}))
                     actions.append(TextAlertAction(type: .defaultAction, title: self.presentationData.strings.Login_Yes, action: { [weak self] in
                         if let strongSelf = self {
-                            strongSelf.loginWithNumber?(strongSelf.controllerNode.currentNumber, strongSelf.controllerNode.syncContacts)
+                            if strongSelf.isTestingEnvironment {
+                                print("testing environment has selected")
+                                strongSelf.loginWithNumber?(number, strongSelf.controllerNode.syncContacts)
+                            } else {
+                                strongSelf.loginWithNumber?(strongSelf.controllerNode.currentNumber, strongSelf.controllerNode.syncContacts)
+                            }
                         }
                     }))
                     self.present(standardTextAlertController(theme: AlertControllerTheme(presentationData: self.presentationData), title: logInNumber, text: self.presentationData.strings.Login_PhoneNumberConfirmation, actions: actions), in: .window(.root))

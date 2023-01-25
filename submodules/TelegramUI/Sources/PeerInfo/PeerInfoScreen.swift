@@ -85,6 +85,7 @@ import StickerPackPreviewUI
 import ChatListHeaderComponent
 import ChatControllerInteraction
 import StorageUsageScreen
+import WevModel
 
 enum PeerInfoAvatarEditingMode {
     case generic
@@ -470,6 +471,9 @@ private enum PeerInfoSettingsSection {
     case logout
     case rememberPassword
     case emojiStatus
+    case watchLater
+    case shareEarn
+    case applyReferral
 }
 
 private enum PeerInfoReportType {
@@ -639,11 +643,12 @@ private enum SettingsSection: Int, CaseIterable {
     case phone
     case accounts
     case proxy
+    case wev
     case shortcuts
     case advanced
-    case payment
     case extra
     case support
+    case payment
 }
 
 private func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentationData: PresentationData, interaction: PeerInfoInteraction, isExpanded: Bool) -> [(AnyHashable, [PeerInfoScreenItem])] {
@@ -763,6 +768,32 @@ private func settingsItems(data: PeerInfoScreenData?, context: AccountContext, p
         }
     }
     
+    //Add Watch Later
+    let count = fetchWatchList().count
+    let watchLaterLabel = count == 0 ? "0" : "\(count)"
+    items[.wev]!.append(PeerInfoScreenDisclosureItem(id: 1, label: .badge(watchLaterLabel, presentationData.theme.list.itemAccentColor), text: presentationData.strings.WEV_WatchLater, icon: PresentationResourcesSettings.watchLater, action: {
+        interaction.openSettings(.watchLater)
+    }))
+    
+    items[.wev]!.append(PeerInfoScreenDisclosureItem(id: 2, text: presentationData.strings.WEV_Reward, icon: PresentationResourcesSettings.shareEarn, action: {
+        interaction.openSettings(.shareEarn)
+    }))
+    
+    items[.wev]!.append(PeerInfoScreenDisclosureItem(id: 3, text: presentationData.strings.WEV_ApplyReferral, icon: PresentationResourcesSettings.applyReferral, action: {
+        interaction.openSettings(.applyReferral)
+    }))
+    
+   //Show Feed Tab
+    let isShowTab = UserDefaults.standard.bool(forKey: "isShowFeed")
+    items[.wev]!.append(PeerInfoScreenSwitchItem(id: 4, text: presentationData.strings.WEV_FeedTab, value: isShowTab, icon: PresentationResourcesSettings.feedTab, toggled: { value in
+            print(value)
+        UserDefaults.standard.set(value, forKey: "isShowFeed")
+        UserDefaults.standard.synchronize()
+        if let rootCobtroller = context.sharedContext.mainWindow?.viewController as? TelegramRootController {
+            rootCobtroller.updateRootControllers(showCallsTab: value)
+        }
+    }))
+
     items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 1, text: presentationData.strings.Settings_SavedMessages, icon: PresentationResourcesSettings.savedMessages, action: {
         interaction.openSettings(.savedMessages)
     }))
@@ -823,7 +854,7 @@ private func settingsItems(data: PeerInfoScreenData?, context: AccountContext, p
         interaction.openPaymentMethod()
     }))*/
     
-    let stickersLabel: String
+    /*let stickersLabel: String
     if let settings = data.globalSettings {
         stickersLabel = settings.unreadTrendingStickerPacks > 0 ? "\(settings.unreadTrendingStickerPacks)" : ""
     } else {
@@ -844,17 +875,18 @@ private func settingsItems(data: PeerInfoScreenData?, context: AccountContext, p
                 interaction.openSettings(.watch)
             }))
         }
-    }
+    }*/
     
-    items[.support]!.append(PeerInfoScreenDisclosureItem(id: 0, text: presentationData.strings.Settings_Support, icon: PresentationResourcesSettings.support, action: {
+    /*items[.support]!.append(PeerInfoScreenDisclosureItem(id: 0, text: presentationData.strings.Settings_Support, icon: PresentationResourcesSettings.support, action: {
         interaction.openSettings(.support)
-    }))
-    items[.support]!.append(PeerInfoScreenDisclosureItem(id: 1, text: presentationData.strings.Settings_FAQ, icon: PresentationResourcesSettings.faq, action: {
+    }))*/
+    
+    items[.support]!.append(PeerInfoScreenDisclosureItem(id: 1, text: presentationData.strings.Settings_WevFAQ, icon: PresentationResourcesSettings.faq, action: {
         interaction.openSettings(.faq)
     }))
-    items[.support]!.append(PeerInfoScreenDisclosureItem(id: 2, text: presentationData.strings.Settings_Tips, icon: PresentationResourcesSettings.tips, action: {
+    /*items[.support]!.append(PeerInfoScreenDisclosureItem(id: 2, text: presentationData.strings.Settings_Tips, icon: PresentationResourcesSettings.tips, action: {
         interaction.openSettings(.tips)
-    }))
+    }))*/
     
     var result: [(AnyHashable, [PeerInfoScreenItem])] = []
     for section in SettingsSection.allCases {
@@ -7407,6 +7439,12 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, UIScrollViewDelegate 
                 if let settings = self.data?.globalSettings {
                     push(notificationsAndSoundsController(context: self.context, exceptionsList: settings.notificationExceptions))
                 }
+            case .watchLater:
+                push(WEVWatchLaterController(context: self.context))
+            case .shareEarn:
+                push(WEVPointsController(context: self.context))
+            case .applyReferral:
+                push(WEVApplyReferalController(context: self.context))
             case .privacyAndSecurity:
                 if let settings = self.data?.globalSettings {
                     let _ = (combineLatest(self.blockedPeers.get(), self.hasTwoStepAuth.get())
@@ -7566,7 +7604,7 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, UIScrollViewDelegate 
     }
     
     private func openFaq(anchor: String? = nil) {
-        let presentationData = self.presentationData
+        /*let presentationData = self.presentationData
         let progressSignal = Signal<Never, NoError> { [weak self] subscriber in
             let controller = OverlayStatusController(theme: presentationData.theme, type: .loading(cancelled: nil))
             self?.controller?.present(controller, in: .window(.root))
@@ -7595,7 +7633,8 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, UIScrollViewDelegate 
                     self?.controller?.push(controller)
                 }, dismissInput: {}, contentContext: nil)
             }
-        })
+        })*/
+        self.context.sharedContext.openExternalUrl(context: self.context, urlContext: .generic, url: "http://3.104.76.235/faq/", forceExternal: true, presentationData: self.presentationData, navigationController: self.controller?.navigationController as? NavigationController, dismissInput: {})
     }
     
     private func openTips() {

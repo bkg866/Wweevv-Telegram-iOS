@@ -97,7 +97,7 @@ public final class CallKitIntegration {
     }
     
     private func donateIntent(peerId: PeerId, displayTitle: String, localContactId: String?) {
-        if #available(iOSApplicationExtension 10.0, iOS 10.0, *) {
+        /*if #available(iOSApplicationExtension 10.0, iOS 10.0, *) {
             let handle = INPersonHandle(value: "tg\(peerId.id._internalGetInt64Value())", type: .unknown)
             let contact = INPerson(personHandle: handle, nameComponents: nil, displayName: displayTitle, image: nil, contactIdentifier: localContactId, customIdentifier: "tg\(peerId.id._internalGetInt64Value())")
         
@@ -107,7 +107,7 @@ public final class CallKitIntegration {
             interaction.direction = .outgoing
             interaction.donate { _ in
             }
-        }
+        }*/
     }
     
     public func applyVoiceChatOutputMode(outputMode: AudioSessionOutputMode) {

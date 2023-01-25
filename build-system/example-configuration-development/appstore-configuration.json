@@ -1,0 +1,14 @@
+{
+	"bundle_id": "com.wweevv.client",
+	"api_id": "29734799",
+	"api_hash": "3d2d4e0591e42c178281cf94762d9513",
+	"team_id": "PP83B8JPN5",
+	"app_center_id": "0",
+	"is_internal_build": "false",
+	"is_appstore_build": "false",
+	"appstore_id": "1561108032",
+	"app_specific_url_scheme": "wev",
+	"premium_iap_product_id": "org.telegram.telegramPremium.monthly",
+	"enable_siri": false,
+	"enable_icloud": true
+}

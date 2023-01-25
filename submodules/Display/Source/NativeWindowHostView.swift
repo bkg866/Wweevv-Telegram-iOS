@@ -206,7 +206,7 @@ private final class WindowRootViewController: UIViewController, UIViewController
         if UIAccessibility.isVoiceOverRunning {
             return nil
         }
-        if #available(iOSApplicationExtension 9.0, iOS 9.0, *) {
+        /*if #available(iOSApplicationExtension 9.0, iOS 9.0, *) {
             guard let result = self.view.hitTest(location, with: nil) else {
                 return nil
             }
@@ -217,7 +217,7 @@ private final class WindowRootViewController: UIViewController, UIViewController
                     return controller
                 }
             }
-        }
+        }*/
         return nil
     }
     

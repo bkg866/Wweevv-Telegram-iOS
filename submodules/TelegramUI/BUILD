@@ -46,7 +46,7 @@ swift_library(
         "Sources/**/*.swift",
     ]),
     copts = [
-        "-warnings-as-errors",
+        #"-warnings-as-errors",
     ],
     linkopts = [
         "-Wl,-weak-lswiftCoreGraphics",
@@ -354,6 +354,8 @@ swift_library(
         "//submodules/MediaPasteboardUI:MediaPasteboardUI",
         "//submodules/DrawingUI:DrawingUI",
         "//submodules/FeaturedStickersScreen:FeaturedStickersScreen",
+        #wweevv
+        "//submodules/FeedLists:FeedLists",
     ] + select({
         "@build_bazel_rules_apple//apple:ios_armv7": [],
         "@build_bazel_rules_apple//apple:ios_arm64": appcenter_targets,

@@ -82,14 +82,14 @@ public extension UIColor {
     convenience init?(hexString: String) {
         let scanner = Scanner(string: hexString)
         if hexString.hasPrefix("#") {
-            scanner.scanLocation = 1
+            scanner.currentIndex = scanner.string.index(after: scanner.currentIndex)
         }
-        var value: UInt32 = 0
-        if scanner.scanHexInt32(&value) {
+        var value: UInt64 = 0
+        if scanner.scanHexInt64(&value) {
             if hexString.count > 7 {
-                self.init(argb: value)
+                self.init(argb: UInt32(value))
             } else {
-                self.init(rgb: value)
+                self.init(rgb: UInt32(value))
             }
         } else {
             return nil
