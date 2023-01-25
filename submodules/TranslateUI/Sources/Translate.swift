@@ -104,7 +104,7 @@ public var supportedTranslationLanguages = [
     "sw",
     "sv",
     "tl",
-    "tg",
+    "wev",
     "ta",
     "tt",
     "te",

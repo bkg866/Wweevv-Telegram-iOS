@@ -110,6 +110,8 @@ swift_library(
         "//submodules/TelegramUI/Components/ChatTimerScreen",
         "//submodules/AnimatedAvatarSetNode",
         "//submodules/TelegramUI/Components/StorageUsageScreen",
+        "//third-party/MBProgressHUD:MBProgressHUD",
+        "//third-party/MJRefresh:MJRefresh",
     ],
     visibility = [
         "//visibility:public",

@@ -26,6 +26,7 @@ import AccountUtils
 import ContextUI
 import TelegramCallsUI
 import AuthorizationUI
+import ContactListUI
 
 final class UnauthorizedApplicationContext {
     let sharedContext: SharedAccountContextImpl
@@ -901,6 +902,13 @@ final class AuthorizedApplicationContext {
             })
         } else {
             self.scheduledOpenExternalUrl = url
+        }
+    }
+    
+    func openVideoPlayer(videoId: String, type: Int) {
+        if let tabbar = self.rootController.rootTabController, let wevDiscover = tabbar.controllers.first as? WEVRootViewController {
+            tabbar.selectedIndex = 0
+            wevDiscover.playUniversalLinkedVideos(videoId: videoId, type: type)
         }
     }
     

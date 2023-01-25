@@ -85,6 +85,7 @@ import StickerPackPreviewUI
 import ChatListHeaderComponent
 import ChatControllerInteraction
 import StorageUsageScreen
+import WevModel
 
 enum PeerInfoAvatarEditingMode {
     case generic
@@ -470,6 +471,9 @@ private enum PeerInfoSettingsSection {
     case logout
     case rememberPassword
     case emojiStatus
+    case watchLater
+    case shareEarn
+    case applyReferral
 }
 
 private enum PeerInfoReportType {
@@ -639,6 +643,7 @@ private enum SettingsSection: Int, CaseIterable {
     case phone
     case accounts
     case proxy
+    case wev
     case shortcuts
     case advanced
     case payment
@@ -763,6 +768,32 @@ private func settingsItems(data: PeerInfoScreenData?, context: AccountContext, p
         }
     }
     
+    //Add Watch Later
+    let count = fetchWatchList().count
+    let watchLaterLabel = count == 0 ? "0" : "\(count)"
+    items[.wev]!.append(PeerInfoScreenDisclosureItem(id: 1, label: .badge(watchLaterLabel, presentationData.theme.list.itemAccentColor), text: presentationData.strings.WEV_WatchLater, icon: PresentationResourcesSettings.watchLater, action: {
+        interaction.openSettings(.watchLater)
+    }))
+    
+    items[.wev]!.append(PeerInfoScreenDisclosureItem(id: 2, text: presentationData.strings.WEV_Reward, icon: PresentationResourcesSettings.shareEarn, action: {
+        interaction.openSettings(.shareEarn)
+    }))
+    
+    items[.wev]!.append(PeerInfoScreenDisclosureItem(id: 3, text: presentationData.strings.WEV_ApplyReferral, icon: PresentationResourcesSettings.applyReferral, action: {
+        interaction.openSettings(.applyReferral)
+    }))
+    
+   //Show Feed Tab
+    let isShowTab = UserDefaults.standard.bool(forKey: "isShowFeed")
+    items[.wev]!.append(PeerInfoScreenSwitchItem(id: 4, text: presentationData.strings.WEV_FeedTab, value: isShowTab, icon: PresentationResourcesSettings.feedTab, toggled: { value in
+            print(value)
+        UserDefaults.standard.set(value, forKey: "isShowFeed")
+        UserDefaults.standard.synchronize()
+        if let rootCobtroller = context.sharedContext.mainWindow?.viewController as? TelegramRootController {
+            rootCobtroller.updateRootControllers(showCallsTab: value)
+        }
+    }))
+
     items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 1, text: presentationData.strings.Settings_SavedMessages, icon: PresentationResourcesSettings.savedMessages, action: {
         interaction.openSettings(.savedMessages)
     }))
@@ -7407,6 +7438,12 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, UIScrollViewDelegate 
                 if let settings = self.data?.globalSettings {
                     push(notificationsAndSoundsController(context: self.context, exceptionsList: settings.notificationExceptions))
                 }
+            case .watchLater:
+                push(WEVWatchLaterController(context: self.context))
+            case .shareEarn:
+                push(WEVPointsController(context: self.context))
+            case .applyReferral:
+                push(WEVApplyReferalController(context: self.context))
             case .privacyAndSecurity:
                 if let settings = self.data?.globalSettings {
                     let _ = (combineLatest(self.blockedPeers.get(), self.hasTwoStepAuth.get())

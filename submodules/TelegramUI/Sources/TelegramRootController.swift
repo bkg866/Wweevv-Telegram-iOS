@@ -16,14 +16,17 @@ import DatePickerNode
 import DebugSettingsUI
 import TabBarUI
 import DrawingUI
+import FeedLists
 
 public final class TelegramRootController: NavigationController {
     private let context: AccountContext
     
     public var rootTabController: TabBarController?
-    
+    //Controllers
+    public var wevRootViewController: WEVRootViewController?
+    public var wevFeedListController: WEVFeedListController?
     public var contactsController: ContactsController?
-    public var callListController: CallListController?
+    //public var callListController: CallListController?
     public var chatListController: ChatListController?
     public var accountSettingsController: PeerInfoScreen?
     
@@ -100,9 +103,18 @@ public final class TelegramRootController: NavigationController {
         if let sharedContext = self.context.sharedContext as? SharedAccountContextImpl {
             chatListController.tabBarItem.badgeValue = sharedContext.switchingData.chatListBadge
         }
-        let callListController = CallListController(context: self.context, mode: .tab)
         
         var controllers: [ViewController] = []
+        
+        //Feed Screen deattach from tabbar
+        let discoverVC = WEVRootViewController(context: self.context)
+        discoverVC.switchToChatsController = {  [weak self] in
+            self?.openChatsController(activateSearch: false)
+        }
+        controllers.append(discoverVC)
+        
+        let wevFeedListController = WEVFeedListController(context: self.context)
+        /*controllers.append(wevFeedListController)*/
         
         let contactsController = ContactsController(context: self.context)
         contactsController.switchToChatsController = {  [weak self] in
@@ -110,9 +122,11 @@ public final class TelegramRootController: NavigationController {
         }
         controllers.append(contactsController)
         
+        /*let callListController = CallListController(context: self.context, mode: .tab)
         if showCallsTab {
             controllers.append(callListController)
-        }
+        }*/
+        
         controllers.append(chatListController)
         
         var restoreSettignsController: (ViewController & SettingsController)?
@@ -131,13 +145,14 @@ public final class TelegramRootController: NavigationController {
             }
             strongSelf.pushViewController(debugController(sharedContext: strongSelf.context.sharedContext, context: strongSelf.context))
         }
-        accountSettingsController.parentController = self
         controllers.append(accountSettingsController)
-                
+        
         tabBarController.setControllers(controllers, selectedIndex: restoreSettignsController != nil ? (controllers.count - 1) : (controllers.count - 2))
         
+        self.wevRootViewController = discoverVC
+        self.wevFeedListController = wevFeedListController
         self.contactsController = contactsController
-        self.callListController = callListController
+        //self.callListController = callListController
         self.chatListController = chatListController
         self.accountSettingsController = accountSettingsController
         self.rootTabController = tabBarController
@@ -149,10 +164,12 @@ public final class TelegramRootController: NavigationController {
             return
         }
         var controllers: [ViewController] = []
-        controllers.append(self.contactsController!)
+        controllers.append(self.wevRootViewController!)
         if showCallsTab {
-            controllers.append(self.callListController!)
+            //controllers.append(self.callListController!)
+            controllers.append(self.wevFeedListController!)
         }
+        controllers.append(self.contactsController!)
         controllers.append(self.chatListController!)
         controllers.append(self.accountSettingsController!)
         

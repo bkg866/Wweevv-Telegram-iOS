@@ -48,6 +48,13 @@ public class UniversalVideoGalleryItem: GalleryItem {
     let isSecret: Bool
     let landscape: Bool
     let timecode: Double?
+    //wweevv
+    let isShowLike: Bool
+    var isVideoLiked: Bool
+    let isShowSubcribe: Bool
+    var isVideoSubscribed: Bool
+    let isShowShare: Bool
+
     let playbackRate: () -> Double?
     let configuration: GalleryConfiguration?
     let playbackCompleted: () -> Void
@@ -55,8 +62,15 @@ public class UniversalVideoGalleryItem: GalleryItem {
     let openActionOptions: (GalleryControllerInteractionTapAction, Message) -> Void
     let storeMediaPlaybackState: (MessageId, Double?, Double) -> Void
     let present: (ViewController, Any?) -> Void
+    
+    //wweevv button actions
+    public var onLike: (() -> Void)?
+    public var onDislike: (() -> Void)?
+    public var onSubscribe: (() -> Void)?
+    public var onDesubscribe: (() -> Void)?
+    public var onShare: (() -> Void)?
 
-    public init(context: AccountContext, presentationData: PresentationData, content: UniversalVideoContent, originData: GalleryItemOriginData?, indexData: GalleryItemIndexData?, contentInfo: UniversalVideoGalleryItemContentInfo?, caption: NSAttributedString, description: NSAttributedString? = nil, credit: NSAttributedString? = nil, displayInfoOnTop: Bool = false, hideControls: Bool = false, fromPlayingVideo: Bool = false, isSecret: Bool = false, landscape: Bool = false, timecode: Double? = nil, playbackRate: @escaping () -> Double?, configuration: GalleryConfiguration? = nil, playbackCompleted: @escaping () -> Void = {}, performAction: @escaping (GalleryControllerInteractionTapAction) -> Void, openActionOptions: @escaping (GalleryControllerInteractionTapAction, Message) -> Void, storeMediaPlaybackState: @escaping (MessageId, Double?, Double) -> Void, present: @escaping (ViewController, Any?) -> Void) {
+    public init(context: AccountContext, presentationData: PresentationData, content: UniversalVideoContent, originData: GalleryItemOriginData?, indexData: GalleryItemIndexData?, contentInfo: UniversalVideoGalleryItemContentInfo?, caption: NSAttributedString, description: NSAttributedString? = nil, credit: NSAttributedString? = nil, displayInfoOnTop: Bool = false, hideControls: Bool = false, fromPlayingVideo: Bool = false, isSecret: Bool = false, landscape: Bool = false, timecode: Double? = nil, isShowLike: Bool = false, isVideoLiked: Bool = false, isShowSubcribe: Bool = false, isVideoSubscribed: Bool = false, isShowShare: Bool = false, playbackRate: @escaping () -> Double?, configuration: GalleryConfiguration? = nil, playbackCompleted: @escaping () -> Void = {}, performAction: @escaping (GalleryControllerInteractionTapAction) -> Void, openActionOptions: @escaping (GalleryControllerInteractionTapAction, Message) -> Void, storeMediaPlaybackState: @escaping (MessageId, Double?, Double) -> Void, present: @escaping (ViewController, Any?) -> Void) {
         self.context = context
         self.presentationData = presentationData
         self.content = content
@@ -79,6 +93,13 @@ public class UniversalVideoGalleryItem: GalleryItem {
         self.openActionOptions = openActionOptions
         self.storeMediaPlaybackState = storeMediaPlaybackState
         self.present = present
+        //wweevv
+        self.isShowLike = isShowLike
+        self.isVideoLiked = isVideoLiked
+        self.isShowSubcribe = isShowSubcribe
+        self.isVideoSubscribed = isVideoSubscribed
+        self.isShowShare = isShowShare
+
     }
     
     public func node(synchronous: Bool) -> GalleryItemNode {
@@ -94,6 +115,25 @@ public class UniversalVideoGalleryItem: GalleryItem {
             node.titleContentView?.setMessage(message, presentationData: self.presentationData, accountPeerId: self.context.account.peerId)
         }
         
+        node.onLike = {
+            self.onLike?()
+        }
+        
+        node.onDislike = {
+            self.onDislike?()
+        }
+        
+        node.onSubscribe = {
+            self.onSubscribe?()
+        }
+        
+        node.onDesubscribe = {
+            self.onDesubscribe?()
+        }
+        
+        node.onShare = {
+            self.onShare?()
+        }
         return node
     }
     
@@ -789,6 +829,13 @@ final class UniversalVideoGalleryItemNode: ZoomableContentGalleryItemNode {
 
     private var pictureInPictureContent: AnyObject?
     
+    public var onLike: (() -> Void)?
+    public var onDislike: (() -> Void)?
+    
+    public var onSubscribe: (() -> Void)?
+    public var onShare: (() -> Void)?
+    public var onDesubscribe: (() -> Void)?
+    
     init(context: AccountContext, presentationData: PresentationData, performAction: @escaping (GalleryControllerInteractionTapAction) -> Void, openActionOptions: @escaping (GalleryControllerInteractionTapAction, Message) -> Void, present: @escaping (ViewController, Any?) -> Void) {
         self.context = context
         self.presentationData = presentationData
@@ -1012,10 +1059,38 @@ final class UniversalVideoGalleryItemNode: ZoomableContentGalleryItemNode {
     }
     
     func setupItem(_ item: UniversalVideoGalleryItem) {
-        if self.item?.content.id != item.content.id {            
-            var chapters = parseMediaPlayerChapters(item.caption)
+        if self.item?.content.id != item.content.id {
+            func parseChapters(_ string: NSAttributedString) -> [MediaPlayerScrubbingChapter] {
+                var timecodeRanges: [(NSRange, TelegramTimecode)] = []
+                var lineRanges: [NSRange] = []
+                string.enumerateAttributes(in: NSMakeRange(0, string.length), options: [], using: { attributes, range, _ in
+                    if let timecode = attributes[NSAttributedString.Key(TelegramTextAttributes.Timecode)] as? TelegramTimecode {
+                        timecodeRanges.append((range, timecode))
+                    }
+                })
+                (string.string as NSString).enumerateSubstrings(in: NSMakeRange(0, string.length), options: .byLines, using: { _, range, _, _ in
+                    lineRanges.append(range)
+                })
+                
+                var chapters: [MediaPlayerScrubbingChapter] = []
+                for (timecodeRange, timecode) in timecodeRanges {
+                    inner: for lineRange in lineRanges {
+                        if lineRange.contains(timecodeRange.location) {
+                            if lineRange.length > timecodeRange.length {
+                                var title = ((string.string as NSString).substring(with: lineRange) as NSString).replacingCharacters(in: NSMakeRange(timecodeRange.location - lineRange.location, timecodeRange.length), with: "")
+                                title = title.trimmingCharacters(in: .whitespacesAndNewlines).trimmingCharacters(in: .punctuationCharacters)
+                                chapters.append(MediaPlayerScrubbingChapter(title: title, start: timecode.time))
+                            }
+                            break inner
+                        }
+                    }
+                }
+                return chapters
+            }
+            
+            var chapters = parseChapters(item.caption)
             if chapters.isEmpty, let description = item.description {
-                chapters = parseMediaPlayerChapters(description)
+                chapters = parseChapters(description)
             }
             let scrubberView = ChatVideoGalleryItemScrubberView(chapters: chapters)
             self.scrubberView = scrubberView
@@ -1386,7 +1461,7 @@ final class UniversalVideoGalleryItemNode: ZoomableContentGalleryItemNode {
                     
                     if isAnimated || disablePlayerControls {
                         strongSelf.footerContentNode.content = .info
-                    } else if isPaused && !strongSelf.ignorePauseStatus && strongSelf.isCentral == true {
+                    } else if isPaused && !strongSelf.ignorePauseStatus {
                         if hasStarted || strongSelf.didPause {
                             strongSelf.footerContentNode.content = .playback(paused: true, seekable: seekable)
                         } else if let fetchStatus = fetchStatus, !strongSelf.requiresDownload {
@@ -1401,6 +1476,38 @@ final class UniversalVideoGalleryItemNode: ZoomableContentGalleryItemNode {
             self.zoomableContent = (videoSize, videoNode)
                         
             var barButtonItems: [UIBarButtonItem] = []
+            
+            //code for add like button
+            if item.isShowLike {
+                if item.isVideoLiked {
+                    //Show like button over here
+                    let rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "watchlater_selected"), style: .plain, target: self, action: #selector(self.likeButtonPressed))
+                    barButtonItems.append(rightBarButtonItem)
+                } else {
+                    //Show like button over here
+                    let rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "watchlater_unselected"), style: .plain, target: self, action: #selector(self.likeButtonPressed))
+                    barButtonItems.append(rightBarButtonItem)
+                }
+            }
+            
+            //code for add like button
+            if item.isShowSubcribe {
+                if item.isVideoSubscribed {
+                    //Show like button over here
+                    let rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "notification_selected"), style: .plain, target: self, action: #selector(self.subScribeButtonPressed))
+                    barButtonItems.append(rightBarButtonItem)
+                } else {
+                    //Show like button over here
+                    let rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "notification"), style: .plain, target: self, action: #selector(self.subScribeButtonPressed))
+                    barButtonItems.append(rightBarButtonItem)
+                }
+            }
+            
+            if item.isShowShare {
+                let rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "shareVideo"), style: .plain, target: self, action: #selector(self.shareButtonPressed))
+                barButtonItems.append(rightBarButtonItem)
+            }
+
             if hasLinkedStickers {
                 let rightBarButtonItem = UIBarButtonItem(image: generateTintedImage(image: UIImage(bundleImageName: "Media Gallery/Stickers"), color: .white), style: .plain, target: self, action: #selector(self.openStickersButtonPressed))
                 barButtonItems.append(rightBarButtonItem)
@@ -1410,7 +1517,7 @@ final class UniversalVideoGalleryItemNode: ZoomableContentGalleryItemNode {
                 self.pictureInPictureButton = rightBarButtonItem
                 barButtonItems.append(rightBarButtonItem)
                 self.hasPictureInPicture = true
-            } else {
+            }  else {
                 self.hasPictureInPicture = false
             }
 
@@ -1438,7 +1545,7 @@ final class UniversalVideoGalleryItemNode: ZoomableContentGalleryItemNode {
                     barButtonItems.append(moreMenuItem)
                 }
             }
-
+            
             self._rightBarButtonItems.set(.single(barButtonItems))
         
             videoNode.playbackCompleted = { [weak self, weak videoNode] in
@@ -1486,6 +1593,61 @@ final class UniversalVideoGalleryItemNode: ZoomableContentGalleryItemNode {
         }
         self.footerContentNode.setup(origin: item.originData, caption: item.caption)
     }
+    
+    //user has pressed shared button
+    @objc func shareButtonPressed() {
+        self.onShare?()
+    }
+    
+    @objc func likeButtonPressed() {
+        if let item = self.item {
+            item.isVideoLiked = !item.isVideoLiked
+            let rightBarButtonItem = UIBarButtonItem(image: item.isVideoLiked ? UIImage(named: "watchlater_selected") : UIImage(named: "watchlater_unselected"), style: .plain, target: self, action: #selector(self.likeButtonPressed))
+            
+            var barButtonItems: [UIBarButtonItem] = []
+            let _ = self._rightBarButtonItems.get().start { itemsArray in
+                if let barItems = itemsArray {
+                    barButtonItems.append(contentsOf: barItems)
+                    barButtonItems[0] = rightBarButtonItem
+                }
+            } error: { error in
+            } completed: {
+                print("Compelted")
+            }
+            
+            self._rightBarButtonItems.set(.single(barButtonItems))
+            if item.isVideoLiked {
+                self.onLike?()
+            } else {
+                self.onDislike?()
+            }
+        }
+    }
+
+@objc func subScribeButtonPressed() {
+    if let item = self.item {
+        item.isVideoSubscribed = !item.isVideoSubscribed
+        let rightBarButtonItem = UIBarButtonItem(image: item.isVideoSubscribed ? UIImage(named: "notification_selected") : UIImage(named: "notification"), style: .plain, target: self, action: #selector(self.subScribeButtonPressed))
+        
+        var barButtonItems: [UIBarButtonItem] = []
+        let _ = self._rightBarButtonItems.get().start { itemsArray in
+            if let barItems = itemsArray {
+                barButtonItems.append(contentsOf: barItems)
+                barButtonItems[1] = rightBarButtonItem
+            }
+        } error: { error in
+        } completed: {
+            print("Compelted")
+        }
+        
+        self._rightBarButtonItems.set(.single(barButtonItems))
+        if item.isVideoSubscribed {
+            self.onSubscribe?()
+        } else {
+            self.onDesubscribe?()
+        }
+    }
+}
     
     override func controlsVisibilityUpdated(isVisible: Bool) {
         self.controlsVisiblePromise.set(isVisible)
