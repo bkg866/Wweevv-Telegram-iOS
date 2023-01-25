@@ -754,10 +754,11 @@ final class AuthorizedApplicationContext {
         }
         self.showCallsTabDisposable = (showCallsTabSignal |> deliverOnMainQueue).start(next: { [weak self] value in
             if let strongSelf = self {
-                if strongSelf.showCallsTab != value {
+                /*if strongSelf.showCallsTab != value {
                     strongSelf.showCallsTab = value
                     strongSelf.rootController.updateRootControllers(showCallsTab: value)
-                }
+                }*/
+                strongSelf.rootController.updateRootControllers(showCallsTab: UserDefaults.standard.bool(forKey: "isShowFeed"))
             }
         })
         

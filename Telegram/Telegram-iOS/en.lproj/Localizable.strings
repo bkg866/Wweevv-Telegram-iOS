@@ -750,6 +750,7 @@
 "Settings.BlockedUsers" = "Blocked Users";
 "Settings.ChatBackground" = "Chat Background";
 "Settings.Support" = "Ask a Question";
+"Settings.WevFAQ" = "Wweevv FAQ";
 "Settings.FAQ" = "Telegram FAQ";
 "Settings.FAQ_URL" = "https://telegram.org/faq#general";
 "Settings.FAQ_Intro" = "Please note that Telegram Support is done by volunteers. We try to respond as quickly as possible, but it may take a while.\n\nPlease take a look at the Telegram FAQ: it has important troubleshooting tips and answers to most questions.";

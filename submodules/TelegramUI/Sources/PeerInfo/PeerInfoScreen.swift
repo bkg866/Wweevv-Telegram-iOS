@@ -646,9 +646,9 @@ private enum SettingsSection: Int, CaseIterable {
     case wev
     case shortcuts
     case advanced
-    case payment
     case extra
     case support
+    case payment
 }
 
 private func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentationData: PresentationData, interaction: PeerInfoInteraction, isExpanded: Bool) -> [(AnyHashable, [PeerInfoScreenItem])] {
@@ -854,7 +854,7 @@ private func settingsItems(data: PeerInfoScreenData?, context: AccountContext, p
         interaction.openPaymentMethod()
     }))*/
     
-    let stickersLabel: String
+    /*let stickersLabel: String
     if let settings = data.globalSettings {
         stickersLabel = settings.unreadTrendingStickerPacks > 0 ? "\(settings.unreadTrendingStickerPacks)" : ""
     } else {
@@ -875,17 +875,18 @@ private func settingsItems(data: PeerInfoScreenData?, context: AccountContext, p
                 interaction.openSettings(.watch)
             }))
         }
-    }
+    }*/
     
-    items[.support]!.append(PeerInfoScreenDisclosureItem(id: 0, text: presentationData.strings.Settings_Support, icon: PresentationResourcesSettings.support, action: {
+    /*items[.support]!.append(PeerInfoScreenDisclosureItem(id: 0, text: presentationData.strings.Settings_Support, icon: PresentationResourcesSettings.support, action: {
         interaction.openSettings(.support)
-    }))
-    items[.support]!.append(PeerInfoScreenDisclosureItem(id: 1, text: presentationData.strings.Settings_FAQ, icon: PresentationResourcesSettings.faq, action: {
+    }))*/
+    
+    items[.support]!.append(PeerInfoScreenDisclosureItem(id: 1, text: presentationData.strings.Settings_WevFAQ, icon: PresentationResourcesSettings.faq, action: {
         interaction.openSettings(.faq)
     }))
-    items[.support]!.append(PeerInfoScreenDisclosureItem(id: 2, text: presentationData.strings.Settings_Tips, icon: PresentationResourcesSettings.tips, action: {
+    /*items[.support]!.append(PeerInfoScreenDisclosureItem(id: 2, text: presentationData.strings.Settings_Tips, icon: PresentationResourcesSettings.tips, action: {
         interaction.openSettings(.tips)
-    }))
+    }))*/
     
     var result: [(AnyHashable, [PeerInfoScreenItem])] = []
     for section in SettingsSection.allCases {
@@ -7603,7 +7604,7 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, UIScrollViewDelegate 
     }
     
     private func openFaq(anchor: String? = nil) {
-        let presentationData = self.presentationData
+        /*let presentationData = self.presentationData
         let progressSignal = Signal<Never, NoError> { [weak self] subscriber in
             let controller = OverlayStatusController(theme: presentationData.theme, type: .loading(cancelled: nil))
             self?.controller?.present(controller, in: .window(.root))
@@ -7632,7 +7633,8 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, UIScrollViewDelegate 
                     self?.controller?.push(controller)
                 }, dismissInput: {}, contentContext: nil)
             }
-        })
+        })*/
+        self.context.sharedContext.openExternalUrl(context: self.context, urlContext: .generic, url: "http://3.104.76.235/faq/", forceExternal: true, presentationData: self.presentationData, navigationController: self.controller?.navigationController as? NavigationController, dismissInput: {})
     }
     
     private func openTips() {
