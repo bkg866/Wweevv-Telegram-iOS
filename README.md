@@ -46,62 +46,56 @@ mkdir -p "$HOME/telegram-bazel-cache"
 ```
 
 5.  Generate IPA Build of app
-
 ```
 python3 build-system/Make/Make.py \
     --cacheDir="$HOME/telegram-bazel-cache" \
     build \
-    --configurationPath="$HOME/telegram-configuration" \
+    --configurationPath="$HOME/telegram-configuration/appstore-configuration.json" \
     --buildNumber=8 \
-    --configuration=release_universal
+    --configuration=release_universal \
+    --codesigningInformationPath="$HOME/telegram-configuration"
 ```
-
-6. Generate an Xcode project for development build
+6. Generate an Xcode project for development build without extension - To run in real device
+```
+python3 build-system/Make/Make.py \
+    --cacheDir="$HOME/telegram-bazel-cache" \
+    generateProject \
+    --configurationPath="$HOME/telegram-configuration-development/appstore-configuration.json" \
+    --disableExtensions \
+    --codesigningInformationPath="$HOME/telegram-configuration-development"
+```
+7. Generate an Xcode project for development build with extension - To run in real device
 
 ```
 python3 build-system/Make/Make.py \
     --cacheDir="$HOME/telegram-bazel-cache" \
     generateProject \
-    --configurationPath="$HOME/telegram-configuration-development"
+    --configurationPath="$HOME/telegram-configuration-development/appstore-configuration.json" \
+    --codesigningInformationPath="$HOME/telegram-configuration-development"
 ```
-7. (Optional) Generate an Xcode project for production
 
+8. Create Project without extension and 
+
+(probably for simulator) It is possible to generate a project that does not require any codesigning certificates to be installed: add `--disableProvisioningProfiles` flag:
 ```
 python3 build-system/Make/Make.py \
     --cacheDir="$HOME/telegram-bazel-cache" \
     generateProject \
-    --configurationPath="$HOME/telegram-configuration"
+    --configurationPath="$HOME/telegram-configuration-development/appstore-configuration.json" \
+    --disableExtensions \
+    --noCodesigning true \
+    --disableProvisioningProfiles
 ```
-8. Clear Cache
+
+Tip: use `--disableExtensions` when developing to speed up development by not building application extensions and the WatchOS app.
+
+9. Clear Cache
 
 ```
 python3 build-system/Make/Make.py \
     --cacheDir="$HOME/telegram-bazel-cache" \
     clean
 ```
-9. Create Project without extension (Must required extesnion of releae build)
-
-```
-python3 build-system/Make/Make.py \
-    --cacheDir="$HOME/telegram-bazel-cache" \
-    generateProject \
-    --configurationPath="$HOME/telegram-configuration-development" \
-    --disableExtensions
-```
-    
-(probably for simulator) It is possible to generate a project that does not require any codesigning certificates to be installed: add `--disableProvisioningProfiles` flag:
-```
-python3 build-system/Make/Make.py \
-    --cacheDir="$HOME/telegram-bazel-cache" \
-    generateProject \
-    --configurationPath="$HOME/telegram-configuration" \
-    --disableExtensions \
-    --disableProvisioningProfiles
-```
-
-
-Tip: use `--disableExtensions` when developing to speed up development by not building application extensions and the WatchOS app.
-
 
 # Tips
 
