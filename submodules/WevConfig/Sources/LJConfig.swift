@@ -15,25 +15,12 @@ public struct LJConfig {
         return "https://api.wweevv.app/"
     }
     
-    public static var videoUrl: String {
-        return "https://admin.wweevv.app/#/video"
-    }
-
     public static let AppID = "1561108032"
     
-    /// Twitch授权
-    public struct Twitch {
-        public static let clientId = "l18dmbt90mg62552sedbel934401gb"
-        public static let state = "wweevv2021luanqibazao"
-        public static let uri = "https://wweevv.app/"
+    //youtube api key
+    public struct Youtube {
+        public static let apiKey = "AIzaSyCAZjYdBW5zV8ULYvjni3lqOV_URiZVfzU"
     }
-    
-    /// YouTube授权
-    public struct YouTube {
-        static let clientID = "795614219186-k5ms8k92brdsu1lk9b8jt3q26cgurh6l.apps.googleusercontent.com"
-        static let redirectURL = "https://wweevv.app/"
-    }
-    
     
     public struct SupabaseKeys {
         //Production

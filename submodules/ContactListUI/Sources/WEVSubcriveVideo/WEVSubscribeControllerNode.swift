@@ -159,13 +159,8 @@ final class WEVSubscribeControllerNode: ASDisplayNode {
         var arrSubVideo: [Item] = []
         for index in 0..<subscribes.count where subscribes[index].videoType == 1 {
             if let channelId = subscribes[index].youTubeChannelId {
-                Alamofire.request("https://www.googleapis.com/youtube/v3/activities", method: .get, parameters: ["part":"snippet,id,contentDetails","channelId": channelId,"key":"AIzaSyCAZjYdBW5zV8ULYvjni3lqOV_URiZVfzU"]).responseJSON { response in
-                    /*switch response.result {
-                     case .success(let data):
-                     print(data)
-                     case .failure(let error):
-                     print(error.localizedDescription)
-                     }*/
+                Alamofire.request("https://www.googleapis.com/youtube/v3/activities", method: .get, parameters: ["part":"snippet,id,contentDetails","channelId": channelId,"key": LJConfig.Youtube.apiKey]).responseJSON { response in
+
                     guard let data = response.data else { return }
                     do {
                         let decoder = JSONDecoder()
