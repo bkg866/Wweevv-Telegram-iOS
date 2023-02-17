@@ -14,6 +14,11 @@ public struct LJConfig {
     public static var baseURL: String {
         return ""
     }
+        
+    //youtube api key
+    public struct Youtube {
+        public static let apiKey = ""
+    }
     
     public static var videoUrl: String {
         return ""
@@ -33,8 +38,7 @@ public struct LJConfig {
         static let clientID = ""
         static let redirectURL = "https://wweevv.app/"
     }
-    
-    
+        
     public struct SupabaseKeys {
         //Production
         public static let supabaseUrl = ""

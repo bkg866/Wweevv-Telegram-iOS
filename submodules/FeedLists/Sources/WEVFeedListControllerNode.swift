@@ -424,7 +424,7 @@ extension WEVFeedListControllerNode {
             if let channelId = subscribes[index].youTubeChannelId {
                 feedView.toggleRefreshControl(isShow: true)
                 group.enter()
-                Alamofire.request("https://www.googleapis.com/youtube/v3/activities", method: .get, parameters: ["part":"snippet,id,contentDetails","channelId": channelId,"key":"AIzaSyCAZjYdBW5zV8ULYvjni3lqOV_URiZVfzU"]).responseJSON { response in
+                Alamofire.request("https://www.googleapis.com/youtube/v3/activities", method: .get, parameters: ["part":"snippet,id,contentDetails","channelId": channelId,"key": LJConfig.Youtube.apiKey]).responseJSON { response in
                     group.leave()
                     guard let data = response.data else { return }
                     do {
