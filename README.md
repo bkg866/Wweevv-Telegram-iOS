@@ -23,21 +23,14 @@ git clone --recursive -j8 https://github.com/TelegramMessenger/Telegram-iOS.git
 3. Adjust configuration parameters
 
 ```
-//Production 
-mkdir -p $HOME/telegram-configuration (For Production)
-
-//development
-mkdir -p $HOME/telegram-configuration-development (For development)
-
-//Production Configuration copy
-cp -R build-system/example-configuration/* $HOME/telegram-configuration/
-
-//development Configuration copy
-cp -R build-system/example-configuration-development/* $HOME/telegram-configuration-development/
+mkdir -p $HOME/telegram-configuration
+mkdir -p $HOME/telegram-provisioning
+cp build-system/appstore-configuration.json $HOME/telegram-configuration/configuration.json
+cp -R build-system/fake-codesigning $HOME/telegram-provisioning/ 
 ```
 
-- Modify the values in `variables.bzl` (wweevv not required in build system it's already setup for this project)
-- Replace the provisioning profiles in `provisioning` with valid files (wweevv not required in build system it's already added provisioning profile for this project)
+- Modify the values in `configuration.json`
+- Replace the provisioning profiles in `profiles` with valid files
 
 4. (Optional) Create a build cache directory to speed up rebuilds
 
@@ -45,55 +38,43 @@ cp -R build-system/example-configuration-development/* $HOME/telegram-configurat
 mkdir -p "$HOME/telegram-bazel-cache"
 ```
 
-5.  Generate IPA Build of app
+5. Build the app
+
 ```
 python3 build-system/Make/Make.py \
     --cacheDir="$HOME/telegram-bazel-cache" \
     build \
-    --configurationPath="$HOME/telegram-configuration/appstore-configuration.json" \
-    --buildNumber=8 \
-    --configuration=release_universal \
-    --codesigningInformationPath="$HOME/telegram-configuration"
+    --configurationPath=path-to-configuration.json \
+    --codesigningInformationPath=path-to-provisioning-data \
+    --buildNumber=100001 \
+    --configuration=release_universal
 ```
-6. Generate an Xcode project for development build without extension - To run in real device
-```
-python3 build-system/Make/Make.py \
-    --cacheDir="$HOME/telegram-bazel-cache" \
-    generateProject \
-    --configurationPath="$HOME/telegram-configuration-development/appstore-configuration.json" \
-    --disableExtensions \
-    --codesigningInformationPath="$HOME/telegram-configuration-development"
-```
-7. Generate an Xcode project for development build with extension - To run in real device
+
+6. (Optional) Generate an Xcode project
 
 ```
 python3 build-system/Make/Make.py \
     --cacheDir="$HOME/telegram-bazel-cache" \
     generateProject \
-    --configurationPath="$HOME/telegram-configuration-development/appstore-configuration.json" \
-    --codesigningInformationPath="$HOME/telegram-configuration-development"
+    --configurationPath=path-to-configuration.json \
+    --codesigningInformationPath=path-to-provisioning-data \
+    --disableExtensions
 ```
 
-8. **For simulator** - It is possible to generate a project that does not require any codesigning certificates to be installed: add `--disableProvisioningProfiles` flag:
+It is possible to generate a project that does not require any codesigning certificates to be installed: add `--disableProvisioningProfiles` flag:
 ```
 python3 build-system/Make/Make.py \
     --cacheDir="$HOME/telegram-bazel-cache" \
     generateProject \
-    --configurationPath="$HOME/telegram-configuration-development/appstore-configuration.json" \
+    --configurationPath=path-to-configuration.json \
+    --codesigningInformationPath=path-to-provisioning-data \
     --disableExtensions \
-    --noCodesigning true \
     --disableProvisioningProfiles
 ```
 
+
 Tip: use `--disableExtensions` when developing to speed up development by not building application extensions and the WatchOS app.
 
-9. Clear Cache
-
-```
-python3 build-system/Make/Make.py \
-    --cacheDir="$HOME/telegram-bazel-cache" \
-    clean
-```
 
 # Tips
 
