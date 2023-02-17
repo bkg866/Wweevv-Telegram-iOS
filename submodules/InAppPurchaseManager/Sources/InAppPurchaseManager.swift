@@ -81,7 +81,7 @@ public final class InAppPurchaseManager: NSObject {
         }
         
         public func pricePerMonth(_ monthsCount: Int) -> String {
-            let price = self.skProduct.price.dividing(by: NSDecimalNumber(value: monthsCount)).prettyPrice().round(2)
+            let price = self.skProduct.price.dividing(by: NSDecimalNumber(value: monthsCount)).round(2)
             return self.numberFormatter.string(from: price) ?? ""
         }
         
@@ -152,10 +152,12 @@ public final class InAppPurchaseManager: NSObject {
     
     private final class PaymentTransactionContext {
         var state: SKPaymentTransactionState?
+        var isUpgrade: Bool
         var targetPeerId: PeerId?
         let subscriber: (TransactionState) -> Void
         
-        init(targetPeerId: PeerId?, subscriber: @escaping (TransactionState) -> Void) {
+        init(isUpgrade: Bool, targetPeerId: PeerId?, subscriber: @escaping (TransactionState) -> Void) {
+            self.isUpgrade = isUpgrade
             self.targetPeerId = targetPeerId
             self.subscriber = subscriber
         }
@@ -234,7 +236,7 @@ public final class InAppPurchaseManager: NSObject {
         }
     }
     
-    public func buyProduct(_ product: Product, targetPeerId: PeerId? = nil) -> Signal<PurchaseState, PurchaseError> {
+    public func buyProduct(_ product: Product, isUpgrade: Bool = false, targetPeerId: PeerId? = nil) -> Signal<PurchaseState, PurchaseError> {
         if !self.canMakePayments {
             return .fail(.cantMakePayments)
         }
@@ -256,7 +258,7 @@ public final class InAppPurchaseManager: NSObject {
             let disposable = MetaDisposable()
             
             self.stateQueue.async {
-                let paymentContext = PaymentTransactionContext(targetPeerId: targetPeerId, subscriber: { state in
+                let paymentContext = PaymentTransactionContext(isUpgrade: isUpgrade, targetPeerId: targetPeerId, subscriber: { state in
                     switch state {
                         case let .purchased(transactionId), let .restored(transactionId):
                             if let transactionId = transactionId {
@@ -303,6 +305,19 @@ public final class InAppPurchaseManager: NSObject {
         }
         return signal
     }
+    
+    public struct ReceiptPurchase: Equatable {
+        public let productId: String
+        public let transactionId: String
+        public let expirationDate: Date
+    }
+    
+    public func getReceiptPurchases() -> [ReceiptPurchase] {
+        guard let data = getReceiptData(), let receipt = parseReceipt(data) else {
+            return []
+        }
+        return receipt.purchases.map { ReceiptPurchase(productId: $0.productId, transactionId: $0.transactionId, expirationDate: $0.expirationDate) }
+    }
 }
 
 extension InAppPurchaseManager: SKProductsRequestDelegate {
@@ -348,7 +363,6 @@ extension InAppPurchaseManager: SKPaymentTransactionObserver {
                 switch transaction.transactionState {
                     case .purchased:
                         Logger.shared.log("InAppPurchaseManager", "Account \(accountPeerId), transaction \(transaction.transactionIdentifier ?? ""), original transaction \(transaction.original?.transactionIdentifier ?? "none") purchased")
-                    
                         transactionState = .purchased(transactionId: transaction.transactionIdentifier)
                         transactionsToAssign.append(transaction)
                     case .restored:
@@ -368,6 +382,7 @@ extension InAppPurchaseManager: SKPaymentTransactionObserver {
                                 productId: transaction.payment.productIdentifier,
                                 content: PendingInAppPurchaseState(
                                     productId: transaction.payment.productIdentifier,
+                                    isUpgrade: paymentContext.isUpgrade,
                                     targetPeerId: paymentContext.targetPeerId
                                 )
                             ).start()
@@ -429,7 +444,23 @@ extension InAppPurchaseManager: SKPaymentTransactionObserver {
                         }
                     }
                 } else {
-                    purpose = .single(.subscription)
+                    let isUpgrade: Signal<Bool, NoError>
+                    if let isUpgradeValue = paymentContexts[productIdentifier]?.isUpgrade {
+                        isUpgrade = .single(isUpgradeValue)
+                    } else {
+                        isUpgrade = pendingInAppPurchaseState(engine: self.engine, productId: productIdentifier)
+                        |> mapToSignal { state -> Signal<Bool, NoError> in
+                            if let state = state {
+                                return .single(state.isUpgrade)
+                            } else {
+                                return .single(false)
+                            }
+                        }
+                    }
+                    purpose = isUpgrade
+                    |> map { isUpgrade in
+                        return isUpgrade ? .upgrade : .subscription
+                    }
                 }
             
                 let receiptData = getReceiptData() ?? Data()
@@ -506,10 +537,12 @@ extension InAppPurchaseManager: SKPaymentTransactionObserver {
 
 private final class PendingInAppPurchaseState: Codable {
     public let productId: String
+    public let isUpgrade: Bool
     public let targetPeerId: PeerId?
         
-    public init(productId: String, targetPeerId: PeerId?) {
+    public init(productId: String, isUpgrade: Bool, targetPeerId: PeerId?) {
         self.productId = productId
+        self.isUpgrade = isUpgrade
         self.targetPeerId = targetPeerId
     }
     
@@ -517,6 +550,7 @@ private final class PendingInAppPurchaseState: Codable {
         let container = try decoder.container(keyedBy: StringCodingKey.self)
 
         self.productId = try container.decode(String.self, forKey: "productId")
+        self.isUpgrade = try container.decodeIfPresent(Bool.self, forKey: "isUpgrade") ?? false
         self.targetPeerId = (try container.decodeIfPresent(Int64.self, forKey: "targetPeerId")).flatMap { PeerId(namespace: Namespaces.Peer.CloudUser, id: PeerId.Id._internalFromInt64Value($0)) }
     }
     
@@ -524,6 +558,7 @@ private final class PendingInAppPurchaseState: Codable {
         var container = encoder.container(keyedBy: StringCodingKey.self)
 
         try container.encode(self.productId, forKey: "productId")
+        try container.encode(self.isUpgrade, forKey: "isUpgrade")
         if let targetPeerId = self.targetPeerId {
             try container.encode(targetPeerId.id._internalGetInt64Value(), forKey: "targetPeerId")
         }

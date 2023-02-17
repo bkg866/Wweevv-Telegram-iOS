@@ -12,29 +12,46 @@ public struct LJConfig {
         
     
     public static var baseURL: String {
-        return "https://api.wweevv.app/"
+        return ""
     }
-    
-    public static let AppID = "1561108032"
-    
+        
     //youtube api key
     public struct Youtube {
-        public static let apiKey = "AIzaSyCAZjYdBW5zV8ULYvjni3lqOV_URiZVfzU"
+        public static let apiKey = ""
     }
     
+    public static var videoUrl: String {
+        return ""
+    }
+
+    public static let AppID = ""
+    
+    /// Twitch授权
+    public struct Twitch {
+        public static let clientId = ""
+        public static let state = ""
+        public static let uri = ""
+    }
+    
+    /// YouTube授权
+    public struct YouTube {
+        static let clientID = ""
+        static let redirectURL = "https://wweevv.app/"
+    }
+        
     public struct SupabaseKeys {
         //Production
-        public static let supabaseUrl = "https://pqxcxltwoifmxcmhghzf.supabase.co"
-        public static let supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxeGN4bHR3b2lmbXhjbWhnaHpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjAxODczNDQsImV4cCI6MTk3NTc2MzM0NH0.NiufAQmZ3Oy7eP7wNWF-tvH-e2D-UIz-vPLpLAyDMow"
+        public static let supabaseUrl = ""
+        public static let supabaseKey = ""
         
 //        //Development
-//        public static let supabaseUrl = "https://rlzbzdrueihvlzcqskgd.supabase.co"
-//        public static let supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsemJ6ZHJ1ZWlodmx6Y3Fza2dkIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjQ2MDE3MTYsImV4cCI6MTk4MDE3NzcxNn0.vlmVDDf50rb5SJ68F5u6IyckeTrW9c6Oa3_YhFyhD7c"
+//        public static let supabaseUrl = ""
+//        public static let supabaseKey = ""
         
     }
     
     public struct API {
-        public static let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJ1c2VySWRcIjpcInVzX2M1TTN6MER4OHZcIixcImVtYWlsXCI6XCJ3d2VldnYxQGdtYWlsLmNvbVwifSIsImlhdCI6MTY2MzI0MTQ2N30.GEYCOKk5xbsMX0lk0q0EE6nRl4KiHRaFzYS2i2M3PSuATx82i_giIu-UE3wJq3owPTxCQD47q67V92SL1Q3q5A"
+        public static let token = ""
     }
     
     public struct SupabaseColumns {
